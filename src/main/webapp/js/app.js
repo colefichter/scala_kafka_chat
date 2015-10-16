@@ -11,7 +11,7 @@ define([
     
 
     //This app.js file is the bootstrapper. It starts require, and loads our AppView which runs the actual application.
-    return new AppView();
+    return new AppView().render().promise();
   }
 
   return {
