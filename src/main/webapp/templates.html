@@ -2,8 +2,30 @@
 
 <div>
     <label>Enter your name:</label>
-    <input type="text" id="name" />
-    <input type="button" id="ok" value="Start" />
+    <form>
+	    <input type="text" id="name" />
+	    <input type="submit" id="ok" value="Start" />
+    </form>
+</div>
+
+</script>
+
+<script type="text/template" id="chat_template">
+
+<div>
+	<form>
+		<div>
+			<label>Enter your name:</label>
+		    <select id="topics">
+		    	<option><i>Topics are loading...</i></option>
+		    </select>
+		</div>
+		<div>
+		    <div id="messages"></div>
+		    <input type="text" id="message" />
+		    <input type="button" id="send" value="Send Message" />
+	    </div>
+    </form>
 </div>
 
 </script>

@@ -1,7 +1,17 @@
 body {
-  padding-top: 50px;
+  padding-top: 10px;
 }
 .starter-template {
-  padding: 40px 15px;
+  padding: 20px 15px;
   text-align: center;
+}
+
+#messages {
+	margin: auto;
+	height: 400px;
+	width: 515px;
+	border: solid 1px grey;
+}
+#message {
+	width: 400px;
 }
