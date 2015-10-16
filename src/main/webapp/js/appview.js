@@ -15,6 +15,26 @@ define([
         }
     });
 
+    var Message = Backbone.Model.extend({
+      defaults: {
+        "type": "info",
+        "text": "",
+        "sender": ""
+      }
+    });
+
+    var Messages = Backbone.Collection.extend({
+      model: Message
+    });
+
+    var MessageList = BaseLayout.extend({
+      template: "#list_template",
+
+      initialize: function (options) {
+        console.log("MessageList started.", this.collection);
+      }
+    });
+
     var NameView = BaseLayout.extend({
         template: "#name_template",
 
@@ -44,7 +64,7 @@ define([
       template: "#chat_template",
 
       events: {
-
+        'change #topics': "onTopicChanged"
       },
 
       initialize: function (options) {
@@ -75,10 +95,25 @@ define([
         _.each(topics, function (x) {
           list.append("<option value='" + x +"'>" + x +"</option>");
         });
+
+        list.trigger("change");
       },
 
       failedToLoadTopics: function (topics) {
         alert("Unable to load the chat topics! Try reloading the page.");
+      },
+
+      onTopicChanged: function () {
+        var topic = this.$el.find("#topics").val();
+
+        console.log("onTopicChanged", topic);
+
+        var view = new MessageList({
+          collection: new Messages(), 
+          topic: topic
+        });
+        this.setView("#messages", view);
+        view.render();
       }
     });
 
