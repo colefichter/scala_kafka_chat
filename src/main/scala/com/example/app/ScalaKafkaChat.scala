@@ -42,6 +42,6 @@ class ScalaKafkaChat extends Scala_kafka_chatStack {
   }
 }
 
-class Message (var text: String, var sender: String) {
-  override def toString = sender + ": " + text
+class Message (var topic: String, var text: String, var sender: String) {
+  override def toString = "(" + topic + ") " + sender + ": " + text
 }

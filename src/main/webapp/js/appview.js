@@ -39,6 +39,7 @@ define([
 
     var Message = Backbone.Model.extend({
       defaults: {
+        "topic": "",
         "text": "",
         "sender": ""
       },
@@ -74,6 +75,7 @@ define([
 
 
 
+        //TODO: need to send TOPIC along with message payload!
         //TODO: remove these test messages after wiring up Kafka
         this.appendMessage("Hi Cole!", "Joe");
         this.appendMessage("Hi Joe! How are you?", "Cole");
@@ -100,6 +102,7 @@ define([
 
       appendMessage: function (text, sender) {
         var message = new Message({
+          topic: $("#topics :selected").val(),
           text: text,
           sender: sender
         });
