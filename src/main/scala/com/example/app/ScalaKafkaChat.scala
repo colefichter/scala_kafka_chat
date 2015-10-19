@@ -2,6 +2,7 @@ package com.example.app
 
 import org.scalatra._
 import scalate.ScalateSupport
+import net.liftweb.json._
 
 class ScalaKafkaChat extends Scala_kafka_chatStack {
   get("/") {
@@ -21,6 +22,26 @@ class ScalaKafkaChat extends Scala_kafka_chatStack {
   }
 
   post("/message") {
+    // get the POST request data
+    val jsonString = request.body
 
+    // needed for Lift-JSON
+    implicit val formats = DefaultFormats
+
+    // convert the JSON string to a JValue object
+    val jValue = parse(jsonString)
+
+    // deserialize the string into a Stock object
+    val message = jValue.extract[Message]
+
+    // for debugging
+    println(message)
+
+
+    //TODO: send message to KAFKA!
   }
+}
+
+class Message (var text: String, var sender: String) {
+  override def toString = sender + ": " + text
 }

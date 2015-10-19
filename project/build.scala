@@ -28,7 +28,8 @@ object Scala_kafka_chatBuild extends Build {
         "org.scalatra" %% "scalatra-specs2" % ScalatraVersion % "test",
         "ch.qos.logback" % "logback-classic" % "1.1.2" % "runtime",
         "org.eclipse.jetty" % "jetty-webapp" % "9.2.10.v20150310" % "container",
-        "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided"
+        "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided",
+        "net.liftweb" %% "lift-json" % "2.6.2"
         // "org.scalatra" %% "scalatra-json" % "2.4.0.RC1",
         // "org.json4s" %% "json4s-native" % "3.3.0"
       ),
