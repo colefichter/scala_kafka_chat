@@ -11,7 +11,30 @@ body {
 	height: 400px;
 	width: 515px;
 	border: solid 1px grey;
+	overflow-y: scroll;
 }
 #message {
 	width: 400px;
+}
+
+.alert {
+	
+}
+
+.left { 
+	width: auto;
+	float: left;
+	clear: both;
+}
+
+.right {
+	width: auto;
+	float: right;
+	clear: both;
+	text-align: right;
+}
+
+span.name {
+	color: grey;
+	font-style: italic;
 }

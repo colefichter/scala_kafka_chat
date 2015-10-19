@@ -19,4 +19,8 @@ class ScalaKafkaChat extends Scala_kafka_chatStack {
 
   	"[\"Sports\", \"Hobbies\", \"Books\", \"Movies\", \"Travel\", \"Food\"]"
   }
+
+  post("/message") {
+
+  }
 }

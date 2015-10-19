@@ -6,33 +6,14 @@ define([
   'text!../templates.html'
 ], function($, _, Backbone, Layout, templates){
 
-    var BaseLayout = Backbone.Layout.extend({
-        //manage: true,
+    //Global state is ugly, but this is just a simple example to learn about Kafka... we can cut some corners here.
+    var loginName = null;
 
+    var BaseLayout = Backbone.Layout.extend({
         fetchTemplate: function (selector) {
             var tmpStr = $(templates).filter(selector).html();
             return _.template(tmpStr);
         }
-    });
-
-    var Message = Backbone.Model.extend({
-      defaults: {
-        "type": "info",
-        "text": "",
-        "sender": ""
-      }
-    });
-
-    var Messages = Backbone.Collection.extend({
-      model: Message
-    });
-
-    var MessageList = BaseLayout.extend({
-      template: "#list_template",
-
-      initialize: function (options) {
-        console.log("MessageList started.", this.collection);
-      }
     });
 
     var NameView = BaseLayout.extend({
@@ -41,10 +22,6 @@ define([
         events: {
           "click #ok": "onOkClick",
           "submit form": "onOkClick"
-        },
-
-        initialize: function (options) {
-            console.log("NameView created");
         },
 
         afterRender: function () {
@@ -60,15 +37,89 @@ define([
         }
     });
 
+    var Message = Backbone.Model.extend({
+      defaults: {
+        "text": "",
+        "sender": ""
+      },
+
+      url: "/message",
+
+      cssClass: function () {
+        var sender = this.get("sender");
+
+        if (sender === "[system]") {
+          return "warning";
+        }
+
+        if (sender === loginName) {
+          return "success right";
+        }
+
+        return "info left";
+      }
+    });
+
+    var Messages = Backbone.Collection.extend({
+      model: Message
+    });
+
+    var MessageList = BaseLayout.extend({
+      template: "#list_template",
+
+      initialize: function (options) {
+
+
+        this.appendMessage(loginName + " is now chatting about " + options.topic, "[system]");
+
+
+
+        //TODO: remove these test messages after wiring up Kafka
+        this.appendMessage("Hi Cole!", "Joe");
+        this.appendMessage("Hi Joe! How are you?", "Cole");
+      },
+
+      afterRender: function () {
+        this.$el.empty();
+        this.collection.each(_.bind(this.renderMessage, this));
+        this.scrollToBottom();
+
+        return this;
+      },
+
+      scrollToBottom: function () {
+        var el = $("#messages"); //Don't use this.$el because bootstrap creates an inner div automatically...
+        el.scrollTop(el.prop("scrollHeight"));
+      },
+
+      renderMessage: function (message) {
+        var html = "<div class=\"alert alert-" + message.cssClass() + "\" role=\"alert\"><span class='name'>" + 
+              message.get("sender") + ":</span> " + message.get("text") + "</div>";
+        this.$el.append(html);
+      },
+
+      appendMessage: function (text, sender) {
+        var message = new Message({
+          text: text,
+          sender: sender
+        });
+
+        this.collection.create(message);        
+        this.renderMessage(message);
+        this.scrollToBottom();
+      }
+    });
+
     var ChatView = BaseLayout.extend({
       template: "#chat_template",
 
       events: {
-        'change #topics': "onTopicChanged"
+        'change #topics': "onTopicChanged",
+        'click #send': "onSendMessage",
+        'submit form': "onSendMessage"
       },
 
       initialize: function (options) {
-        console.log("ChatView created");
       },
 
       afterRender: function () {
@@ -79,16 +130,12 @@ define([
       },
 
       fetchTopics: function () {
-        console.log("Fetching topics");
-        
         $.get( "/topics")
           .done(_.bind(this.displayTopics, this))
           .fail(_.bind(this.failedToLoadTopics, this));
       },
 
       displayTopics: function (topics) {
-        console.log("TOPICS", topics);
-
         var list = this.$el.find("#topics");
         list.find("option").remove();
 
@@ -106,14 +153,21 @@ define([
       onTopicChanged: function () {
         var topic = this.$el.find("#topics").val();
 
-        console.log("onTopicChanged", topic);
-
         var view = new MessageList({
           collection: new Messages(), 
           topic: topic
         });
         this.setView("#messages", view);
         view.render();
+      },
+
+      onSendMessage: function (e) {
+        var el = this.$el.find("#message"),
+            view = this.getView("#messages");
+
+        e.preventDefault();
+        view.appendMessage(el.val(), loginName);
+        el.val("").focus();
       }
     });
 
@@ -121,8 +175,6 @@ define([
       el: "#appview",
 
       initialize: function (options) {
-        console.log("AppView started!");
-
         this.setupNameView();
       },
 
@@ -134,16 +186,9 @@ define([
       },
 
       doLogin: function (name) {
-        // var self = this,
-        //     loginView = this.getView("#main");
-
-        // loginView.$el.fadeOut(250, function () {
-        //   self.$el.find("#main").show();
-        // });
-
+        loginName = name;
         this.removeView("#main");
         this.setupChatView();
-
       },
 
       setupChatView: function () {
@@ -151,7 +196,6 @@ define([
         this.setView("#main", view);  
         view.render(); //Why do I have to call this manually after changin the view? :(    
       }
-
     });
 
     return AppView;
