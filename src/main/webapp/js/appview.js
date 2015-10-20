@@ -128,31 +128,10 @@ define([
       afterRender: function () {
           var self = this;
 
-          this.$el.find("#message").focus();  
-          this.fetchTopics();
+          this.$el.find("#message").focus(); 
+          this.onTopicChanged();         
       },
-
-      fetchTopics: function () {
-        $.get( "/topics")
-          .done(_.bind(this.displayTopics, this))
-          .fail(_.bind(this.failedToLoadTopics, this));
-      },
-
-      displayTopics: function (topics) {
-        var list = this.$el.find("#topics");
-        list.find("option").remove();
-
-        _.each(topics, function (x) {
-          list.append("<option value='" + x +"'>" + x +"</option>");
-        });
-
-        list.trigger("change");
-      },
-
-      failedToLoadTopics: function (topics) {
-        alert("Unable to load the chat topics! Try reloading the page.");
-      },
-
+      
       onTopicChanged: function () {
         var topic = this.$el.find("#topics").val();
 
