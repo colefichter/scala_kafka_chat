@@ -30,9 +30,9 @@ object Scala_kafka_chatBuild extends Build {
         "org.eclipse.jetty" % "jetty-webapp" % "9.2.10.v20150310" % "container",
         "javax.servlet" % "javax.servlet-api" % "3.1.0" % "provided",
         "net.liftweb" %% "lift-json" % "2.6.2",
+        "org.apache.httpcomponents" % "httpclient" % "4.1.2",
         "org.apache.kafka" %% "kafka"  % "0.8.2.1" //exclude("log4j", "log4j") exclude("org.slf4j","slf4j-log4j12"),
-        // "org.scalatra" %% "scalatra-json" % "2.4.0.RC1",
-        // "org.json4s" %% "json4s-native" % "3.3.0"
+
       ),
       scalateTemplateConfig in Compile <<= (sourceDirectory in Compile){ base =>
         Seq(

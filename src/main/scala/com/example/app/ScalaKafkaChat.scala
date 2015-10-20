@@ -8,7 +8,19 @@ class ScalaKafkaChat extends Scala_kafka_chatStack {
   get("/") {
    contentType = "text/html"
 
+   //TODO: Is this the best place to create the consumer?
+   new KafkaConsumer().createConsumer()
+
    layoutTemplate("/WEB-INF/templates/views/hello-scalate.jade")
+  }
+
+  get("/messages/:topic") {
+    val topic = params("topic")
+
+    println("GET MESSAGES ABOUT " + topic)
+
+    val messages = new KafkaConsumer().getMessages(topic)
+    println("MESSAGES " + messages)
   }
 
   post("/message") {
