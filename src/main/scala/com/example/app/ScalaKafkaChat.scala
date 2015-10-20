@@ -8,19 +8,26 @@ class ScalaKafkaChat extends Scala_kafka_chatStack {
   get("/") {
    contentType = "text/html"
 
-   //TODO: Is this the best place to create the consumer?
-   new KafkaConsumer().createConsumer()
-
    layoutTemplate("/WEB-INF/templates/views/hello-scalate.jade")
   }
 
-  get("/messages/:topic") {
-    val topic = params("topic")
+  post("/login/:name") {
+    val name = params("name")
+    KafkaConsumer.createConsumerProxy(name)
+  }
 
-    println("GET MESSAGES ABOUT " + topic)
+  post("/logout/:name") {
+    val name = params("name")
+    KafkaConsumer.deleteConsumerProxy(name)
+  }
 
-    val messages = new KafkaConsumer().getMessages(topic)
+  get("/messages/:name") {
+    val name = params("name")
+    val messages = KafkaConsumer.getMessages(name)
+
     println("MESSAGES " + messages)
+
+    //TODO: return messages to client
   }
 
   post("/message") {

@@ -39,7 +39,6 @@ define([
 
     var Message = Backbone.Model.extend({
       defaults: {
-        "topic": "",
         "text": "",
         "sender": ""
       },
@@ -68,19 +67,6 @@ define([
     var MessageList = BaseLayout.extend({
       template: "#list_template",
 
-      initialize: function (options) {
-
-
-        this.appendMessage(loginName + " is now chatting about " + options.topic, "[system]");
-
-
-
-        //TODO: need to send TOPIC along with message payload!
-        //TODO: remove these test messages after wiring up Kafka
-        this.appendMessage("Hi Cole!", "Joe");
-        this.appendMessage("Hi Joe! How are you?", "Cole");
-      },
-
       afterRender: function () {
         this.$el.empty();
         this.collection.each(_.bind(this.renderMessage, this));
@@ -102,7 +88,6 @@ define([
 
       appendMessage: function (text, sender) {
         var message = new Message({
-          topic: $("#topics :selected").val(),
           text: text,
           sender: sender
         });
@@ -117,32 +102,14 @@ define([
       template: "#chat_template",
 
       events: {
-        'change #topics': "onTopicChanged",
         'click #send': "onSendMessage",
         'submit form': "onSendMessage"
       },
 
-      initialize: function (options) {
-      },
-
       afterRender: function () {
-          var self = this;
-
           this.$el.find("#message").focus(); 
-          this.onTopicChanged();         
       },
       
-      onTopicChanged: function () {
-        var topic = this.$el.find("#topics").val();
-
-        var view = new MessageList({
-          collection: new Messages(), 
-          topic: topic
-        });
-        this.setView("#messages", view);
-        view.render();
-      },
-
       onSendMessage: function (e) {
         var el = this.$el.find("#message"),
             view = this.getView("#messages");
@@ -169,8 +136,25 @@ define([
 
       doLogin: function (name) {
         loginName = name;
-        this.removeView("#main");
-        this.setupChatView();
+        var self = this;
+
+        $.post("/login/" + loginName)
+          .done(function (){
+            $(window).unload(_.bind(self.doLogout, self));
+            self.removeView("#main");
+            self.setupChatView();
+          })
+          .fail(function () {
+            alert("Login failed. Are all four kafka services running?");
+          });
+      },
+
+      doLogout: function () {
+        $.ajax({
+            type: 'POST',
+            async: false,
+            url: '/logout/' + loginName
+        });      
       },
 
       setupChatView: function () {
