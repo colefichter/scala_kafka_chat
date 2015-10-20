@@ -30,15 +30,27 @@ class ScalaKafkaChat extends Scala_kafka_chatStack {
 
     // convert the JSON string to a JValue object
     val jValue = parse(jsonString)
-
     // deserialize the string into a Stock object
     val message = jValue.extract[Message]
-
     // for debugging
-    println(message)
+    println("RECEIVED " + message)
 
 
-    //TODO: send message to KAFKA!
+    publishMessage(message)
+  }
+
+  def publishMessage(message: Message): Unit = {
+    val json = serializeMessage(message)
+    new KafkaProducer().send(message.topic, json)
+  }
+
+  def serializeMessage(message: Message): String = {
+    // needed for Lift-JSON
+    implicit val formats = DefaultFormats
+    val jsonString = Serialization.write(message)
+    println("SERIALIZED " + jsonString)
+
+    jsonString
   }
 }
 
