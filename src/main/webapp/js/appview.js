@@ -74,7 +74,6 @@ define([
       },
 
       beingPolling: function () {
-        console.log("afterRender starting polling")
         _.defer(_.bind(this.pollForMessages, this));
       },
 
@@ -86,7 +85,6 @@ define([
           .done(function(data) { 
             var messages = $.parseJSON(data);
 
-            console.log("Polling complete", messages);
             if (messages.length > 0) {
               _.each(messages, function (x) {
                 self.collection.add(new Message(x.value));
@@ -114,8 +112,8 @@ define([
           text: text,
           sender: sender
         });
-        message.save();
-        //this.collection.create(message);        
+        message.save(); //Don't add to collection, or we'll see duplicates.
+        
         this.renderMessage(message);
         this.scrollToBottom();
       }
@@ -187,7 +185,7 @@ define([
       setupChatView: function () {
         var view = new ChatView();
         this.setView("#main", view);  
-        view.render(); //Why do I have to call this manually after changin the view? :(    
+        view.render();
       }
     });
 

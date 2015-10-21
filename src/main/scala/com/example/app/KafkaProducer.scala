@@ -1,10 +1,5 @@
 package com.example.app
 
-// import java.util.Properties
-// import kafka.common.QueueFullException
-// import kafka.javaapi.producer.Producer
-// import kafka.producer.{ProducerConfig, KeyedMessage}
-
 import org.apache.http.client.methods._
 import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.DefaultHttpClient
@@ -15,39 +10,18 @@ object KafkaHost {
 }
 
 class KafkaProducer {
-	// def send(sender: String, text: String): Unit = {
-	// 	val kafkaTopic = "chatroom"
-	// 	var avroPayload = toAvro(sender, text)
-	// 	val config:ProducerConfig = getProducerConfig
-	// 	val producer = new Producer[String, String](config)
-	// 	val data = new KeyedMessage[String, String](kafkaTopic, avroPayload)
-
-	// 	try {
-	// 		println("SENT " + avroPayload)
-	// 		producer.send(data)
-	// 	}
-	// 	catch { 
-	// 		//TODO: gracfully handle failure when we can't connect to kafka.
-	// 		case e: QueueFullException => //TODO: anything?
-	// 	}
-	// 	finally {
-	// 		producer.close
-	// 	}
-	// }
-
 	def send(sender: String, text: String) {
 		val kafkaTopic = "chatroom"
 		var avroPayload = toAvro(sender, text)
 
-		println(avroPayload)
-
+		// println(avroPayload)
 		val request = new HttpPost(KafkaHost.addr() + "/topics/chatroom")
 		request.setHeader("Content-type", KafkaHost.contentType())
 		request.setEntity(new StringEntity(avroPayload))
 
 		try {
 			val response = (new DefaultHttpClient).execute(request)
-			println(response)
+			//println(response)
 		}
 		catch {
 			case e: Exception => println(e)
@@ -59,14 +33,4 @@ class KafkaProducer {
 		// That schema is a JSON object that is serialized to an escaped string and passed as a string value.
 		"{\"value_schema\": \"{\\\"type\\\": \\\"record\\\", \\\"name\\\": \\\"message\\\", \\\"fields\\\": [{\\\"name\\\": \\\"sender\\\", \\\"type\\\": \\\"string\\\"},{\\\"name\\\": \\\"text\\\", \\\"type\\\": \\\"string\\\"}]}\", \"records\": [{\"value\": {\"sender\": \"" + sender + "\", \"text\": \"" + text + "\"}}]}"
 	}
-
-	// def getProducerConfig: ProducerConfig = {
-	// 	val props = new Properties()
-
-	// 	props.put("metadata.broker.list", "localhost:9092")
-	// 	props.put("serializer.class", "kafka.serializer.StringEncoder")
-	// 	props.put("request.required.acks", "1")
-
-	// 	new ProducerConfig(props)
-	// }
 }
