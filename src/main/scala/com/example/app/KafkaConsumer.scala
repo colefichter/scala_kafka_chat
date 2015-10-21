@@ -3,21 +3,24 @@ package com.example.app
 import org.apache.http.client.methods._
 import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.DefaultHttpClient
+import org.apache.http.util.EntityUtils
 
 // Use the Confluent REST API to consume messages
 object KafkaConsumer {
 	def createConsumerProxy(name: String) {
 
-		//TODO: test this!
-
-		val jsonParams = """{"id":"my_instance","format":"json"}, "auto.offset.reset": "smallest"}"""
+		val url = KafkaHost.addr() + "/consumers/" + name		
+		val consumerProxyConfig = "{\"id\": \"my_instance\", \"format\": \"avro\", \"auto.offset.reset\": \"smallest\"}"
 		
-		val request = new HttpPost("http://localhost:8082/consumers/" + name)
-		request.setHeader("Content-type", "application/json")
+		println(url)
+		println(consumerProxyConfig)
+
+		val request = new HttpPost(url)
+		request.setHeader("Content-type", KafkaHost.contentType())
 		// add the JSON as a StringEntity
-		request.setEntity(new StringEntity(jsonParams))
+		request.setEntity(new StringEntity(consumerProxyConfig))
 		val response = (new DefaultHttpClient).execute(request)
-		 
+
 		println(response)
 	}
 
@@ -25,13 +28,16 @@ object KafkaConsumer {
 		//TODO: write this
 	}
 
-	def getMessages(name: String) {
-		val request = new HttpGet("http://localhost:8082/consumers/" + name +"/instance/my_instance/chatroom")
-		request.setHeader("Content-type", "application/json")
+	def getMessages(name: String):String = {
+		val request = new HttpGet(KafkaHost.addr() + "/consumers/" + name + "/instances/my_instance/topics/chatroom")
+		request.setHeader("Content-type", KafkaHost.contentType())
+		
 		val response = (new DefaultHttpClient).execute(request)
-		 
-		println(response)
+		
+		val messagesJson = EntityUtils.toString(response.getEntity())
 
-		//TODO: how to return messages?
+		println("*** MESSAGES RES: " + messagesJson)
+
+		messagesJson
 	}
 }

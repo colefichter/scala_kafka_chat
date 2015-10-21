@@ -7,8 +7,10 @@ require.config({
     jquery: 'https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min',
     underscore: 'https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min',
     backbone: 'https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.2.3/backbone-min',
-    text: "https://raw.githubusercontent.com/requirejs/text/master/text",
-    layout: "https://raw.githubusercontent.com/tbranyen/backbone.layoutmanager/master/backbone.layoutmanager"
+    //text: "https://raw.githubusercontent.com/requirejs/text/master/text",
+    text: "text",
+    //layout: "https://raw.githubusercontent.com/tbranyen/backbone.layoutmanager/master/backbone.layoutmanager"    
+    layout: "backbone.layoutmanager"
   }
 
 });

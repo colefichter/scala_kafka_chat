@@ -23,46 +23,41 @@ class ScalaKafkaChat extends Scala_kafka_chatStack {
 
   get("/messages/:name") {
     val name = params("name")
-    val messages = KafkaConsumer.getMessages(name)
+    val messagesJson = KafkaConsumer.getMessages(name)
 
-    println("MESSAGES " + messages)
+    println("MESSAGES " + messagesJson)
 
-    //TODO: return messages to client
+    messagesJson
   }
 
-  post("/message") {
-    // get the POST request data
-    val jsonString = request.body
+  post("/message") {    
+    implicit val formats = DefaultFormats // needed for Lift-JSON
+    
 
-    // needed for Lift-JSON
-    implicit val formats = DefaultFormats
 
-    // convert the JSON string to a JValue object
-    val jValue = parse(jsonString)
-    // deserialize the string into a Stock object
-    val message = jValue.extract[Message]
-    // for debugging
+    val jValue = parse(request.body) // convert the JSON string to a JValue object
+    val message = jValue.extract[Message] // deserialize the string into a Stock object
+    
     println("RECEIVED " + message)
 
-
-    publishMessage(message)
+    new KafkaProducer().send(message.sender, message.text)
   }
 
-  def publishMessage(message: Message): Unit = {
-    val json = serializeMessage(message)
-    new KafkaProducer().send(message.topic, json)
-  }
+  // def publishMessage(message: Message): Unit = {
+  //   val json = serializeMessage(message)
+  //   new KafkaProducer().send(message.topic, json)
+  // }
 
-  def serializeMessage(message: Message): String = {
-    // needed for Lift-JSON
-    implicit val formats = DefaultFormats
-    val jsonString = Serialization.write(message)
-    println("SERIALIZED " + jsonString)
+  // def serializeMessage(message: Message): String = {
+  //   // needed for Lift-JSON
+  //   implicit val formats = DefaultFormats
+  //   val jsonString = Serialization.write(message)
+  //   println("SERIALIZED " + jsonString)
 
-    jsonString
-  }
+  //   jsonString
+  // }
 }
 
-class Message (var topic: String, var text: String, var sender: String) {
-  override def toString = "(" + topic + ") " + sender + ": " + text
+class Message (var text: String, var sender: String) {
+  override def toString = sender + ": " + text
 }

@@ -71,8 +71,31 @@ define([
         this.$el.empty();
         this.collection.each(_.bind(this.renderMessage, this));
         this.scrollToBottom();
+      },
 
-        return this;
+      beingPolling: function () {
+        console.log("afterRender starting polling")
+        _.defer(_.bind(this.pollForMessages, this));
+      },
+
+      pollForMessages: function () {
+        var self = this,
+            continuation = _.bind(this.pollForMessages, this);
+
+        $.get("/messages/" + loginName)
+          .done(function(data) { 
+            var messages = $.parseJSON(data);
+
+            console.log("Polling complete", messages);
+            if (messages.length > 0) {
+              _.each(messages, function (x) {
+                self.collection.add(new Message(x.value));
+              });
+              self.render();                
+            }
+
+            _.delay(continuation, 1000);
+          });
       },
 
       scrollToBottom: function () {
@@ -91,8 +114,8 @@ define([
           text: text,
           sender: sender
         });
-
-        this.collection.create(message);        
+        message.save();
+        //this.collection.create(message);        
         this.renderMessage(message);
         this.scrollToBottom();
       }
@@ -107,7 +130,11 @@ define([
       },
 
       afterRender: function () {
-          this.$el.find("#message").focus(); 
+        var view = new MessageList({ collection: new Messages() });
+        this.setView("#messages", view);
+        view.render();
+        view.beingPolling();
+        this.$el.find("#message").focus(); 
       },
       
       onSendMessage: function (e) {

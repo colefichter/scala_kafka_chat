@@ -18,3 +18,5 @@ Start the scala servlet in a terminal:
 > ./sbt
 > ~container:start
 ```
+
+Now visit [http://localhost:8080](http://localhost:8080)
