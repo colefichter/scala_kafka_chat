@@ -20,3 +20,20 @@ Start the scala servlet in a terminal:
 ```
 
 Now visit [http://localhost:8080](http://localhost:8080)
+
+# Architecture of the project
+
+This project is a very simple chat client that uses Apache Kafka as a backing store and messaging system. The front-end has been kept simple in order to focus on learning about Kafka.
+
+The front-end is a rich JavaScript UI built with:
+
+* Require.js
+* JQuery
+* Backbone.js
+* Underscore.js
+* Backbone Layout Manager
+* Bootstrap CSS
+
+The web application is a scalatra servlet written in Scala.
+
+To reduce the complexity of building stateful Kafka consumers, we're using the Confluent REST proxy API to produce and consume messages.
